@@ -5,7 +5,22 @@ import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [target, setTarget] = useState('192.168.1.0/24')
+  const [ports, setPorts] = useState('1-1024')
+  const [launchError, setLaunchError] = useState('')
+
+  const openDesktopScanner = () => {
+    if (!target.trim()) {
+      setLaunchError('Target is required.')
+      return
+    }
+
+    setLaunchError('')
+    const url = `scarlet://scan?target=${encodeURIComponent(
+      target.trim(),
+    )}&ports=${encodeURIComponent(ports.trim() || '1-1024')}`
+    window.location.href = url
+  }
 
   return (
     <>
@@ -21,13 +36,45 @@ function App() {
             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        <div className="scan-panel">
+          <div>
+            <h2>Open desktop scanner</h2>
+            <p>Launch the local app to scan your private network.</p>
+          </div>
+          <div className="scan-row">
+            <label className="scan-field">
+              <span>Target</span>
+              <input
+                type="text"
+                value={target}
+                onChange={(event) => setTarget(event.target.value)}
+                placeholder="192.168.1.0/24"
+              />
+            </label>
+            <label className="scan-field">
+              <span>Ports</span>
+              <input
+                type="text"
+                value={ports}
+                onChange={(event) => setPorts(event.target.value)}
+                placeholder="1-1024"
+              />
+            </label>
+          </div>
+          <div className="scan-actions">
+            <button type="button" className="counter" onClick={openDesktopScanner}>
+              Open desktop app
+            </button>
+            <span className="scan-note">
+              If nothing opens, install or start the desktop app first.
+            </span>
+          </div>
+          {launchError ? (
+            <p className="scan-error" role="alert">
+              {launchError}
+            </p>
+          ) : null}
+        </div>
       </section>
 
       <div className="ticks"></div>

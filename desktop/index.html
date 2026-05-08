@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE MOST IMPORTANT THING EVER MADE BY HUMAN HANDS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Permanent+Marker&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #FFD700;
+    --hot: #FF2D55;
+    --electric: #00F5FF;
+    --fire: #FF6B00;
+    --lime: #AAFF00;
+    --dark: #050510;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* STARS */
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 20% 30%, #0a0a2e 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, #1a0020 0%, transparent 50%),
+                var(--dark);
+  }
+  .stars::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, white, transparent),
+      radial-gradient(1px 1px at 80% 10%, white, transparent),
+      radial-gradient(1px 1px at 50% 60%, #aaa, transparent),
+      radial-gradient(1px 1px at 10% 80%, white, transparent),
+      radial-gradient(1px 1px at 90% 50%, #ccc, transparent),
+      radial-gradient(1px 1px at 35% 90%, white, transparent),
+      radial-gradient(1px 1px at 65% 20%, #eee, transparent),
+      radial-gradient(2px 2px at 42% 45%, white, transparent),
+      radial-gradient(1px 1px at 72% 85%, white, transparent),
+      radial-gradient(1px 1px at 15% 55%, #bbb, transparent);
+    background-size: 300px 300px;
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: 0.6; } to { opacity: 1; } }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--hot);
+    color: white;
+    font-family: 'Anton', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    padding: 0.35rem 1.2rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: pulse-badge 1.5s ease-in-out infinite;
+    box-shadow: 0 0 30px var(--hot), 0 0 60px rgba(255,45,85,0.4);
+  }
+  @keyframes pulse-badge {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--hot); }
+    50% { transform: scale(1.05); box-shadow: 0 0 50px var(--hot), 0 0 80px rgba(255,45,85,0.6); }
+  }
+
+  .main-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 12vw, 10rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--fire) 40%, var(--hot) 70%, #FF00FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: title-shimmer 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(255,215,0,0.5));
+    margin-bottom: 0.5rem;
+  }
+  @keyframes title-shimmer {
+    0%, 100% { filter: drop-shadow(0 0 40px rgba(255,215,0,0.5)); }
+    50% { filter: drop-shadow(0 0 70px rgba(255,215,0,0.9)) drop-shadow(0 0 120px rgba(255,100,0,0.4)); }
+  }
+
+  .sub-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1rem, 3vw, 2rem);
+    letter-spacing: 0.15em;
+    color: var(--electric);
+    text-shadow: 0 0 20px var(--electric), 0 0 40px rgba(0,245,255,0.4);
+    margin-bottom: 2rem;
+    animation: flicker 5s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%, 90%, 100% { opacity: 1; }
+    92% { opacity: 0.8; }
+    94% { opacity: 1; }
+    96% { opacity: 0.6; }
+    98% { opacity: 1; }
+  }
+
+  .hero-desc {
+    max-width: 640px;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 3rem;
+    font-weight: 300;
+  }
+
+  .hero-desc em {
+    color: var(--lime);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  .cta-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+  .cta-primary {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--hot), var(--fire));
+    color: white;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.1s, box-shadow 0.3s;
+    box-shadow: 0 0 30px rgba(255,45,85,0.6), 0 4px 20px rgba(0,0,0,0.5);
+    animation: cta-breathe 2s ease-in-out infinite;
+  }
+  @keyframes cta-breathe {
+    0%, 100% { box-shadow: 0 0 30px rgba(255,45,85,0.6); transform: scale(1); }
+    50% { box-shadow: 0 0 60px rgba(255,45,85,0.9), 0 0 100px rgba(255,107,0,0.4); transform: scale(1.02); }
+  }
+  .cta-primary:hover { transform: scale(1.05) !important; }
+  .cta-primary:active { transform: scale(0.97) !important; }
+
+  .cta-secondary {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    padding: 1rem 2.5rem;
+    border: 2px solid var(--electric);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--electric);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    text-shadow: 0 0 10px var(--electric);
+  }
+  .cta-secondary:hover {
+    background: rgba(0,245,255,0.1);
+    box-shadow: 0 0 30px rgba(0,245,255,0.4);
+  }
+
+  /* SCROLL HINT */
+  .scroll-hint {
+    position: absolute; bottom: 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; letter-spacing: 0.3em; color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+  }
+
+  /* TICKER */
+  .ticker-wrap {
+    position: relative; z-index: 2;
+    background: var(--gold);
+    padding: 0.6rem 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker {
+    display: inline-flex; gap: 3rem;
+    animation: ticker-scroll 25s linear infinite;
+  }
+  .ticker-item {
+    font-family: 'Anton', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--dark);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .ticker-item::after { content: '★'; color: var(--hot); }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* SECTION GENERIC */
+  section {
+    position: relative; z-index: 1;
+    padding: 6rem 2rem;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--electric);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px var(--electric);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  /* STATS */
+  .stats-section { background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    padding: 3rem 2rem;
+    text-align: center;
+    background: rgba(255,255,255,0.03);
+    transition: background 0.3s;
+  }
+  .stat-card:hover { background: rgba(255,255,255,0.06); }
+
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(135deg, var(--gold), var(--fire));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* FEATURES */
+  .features-section { max-width: 1100px; margin: 0 auto; }
+
+  .features-header { text-align: center; margin-bottom: 4rem; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+  }
+
+  .feature-card {
+    padding: 2.5rem;
+    background: rgba(255,255,255,0.02);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,45,85,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover { border-color: rgba(255,45,85,0.4); transform: translateY(-4px); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1.2rem;
+    filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));
+  }
+
+  .feature-name {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .feature-desc {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+  }
+
+  /* QUOTE */
+  .quote-section {
+    background: linear-gradient(135deg, rgba(255,45,85,0.08), rgba(255,107,0,0.05));
+    border-top: 1px solid rgba(255,45,85,0.2);
+    border-bottom: 1px solid rgba(255,45,85,0.2);
+    text-align: center;
+  }
+
+  .giant-quote {
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(1.5rem, 4vw, 3.5rem);
+    line-height: 1.4;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    color: white;
+  }
+
+  .giant-quote span { color: var(--gold); }
+
+  .quote-attr {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* PRICING */
+  .pricing-section { max-width: 900px; margin: 0 auto; text-align: center; }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .pricing-card {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 2.5rem 2rem;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .pricing-card.featured {
+    border-color: var(--gold);
+    background: rgba(255,215,0,0.05);
+    box-shadow: 0 0 40px rgba(255,215,0,0.15);
+  }
+  .pricing-card:hover { transform: translateY(-6px); }
+
+  .pricing-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--dark);
+    font-family: 'Anton', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    padding: 0.25rem 1rem;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .pricing-tier {
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1rem;
+  }
+
+  .pricing-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    line-height: 1;
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+
+  .pricing-price sup {
+    font-size: 1.5rem;
+    vertical-align: top;
+    margin-top: 0.5rem;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .pricing-period {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 2rem;
+  }
+
+  .pricing-perks {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 2rem;
+  }
+
+  .pricing-perks li {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    padding: 0.4rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    font-weight: 300;
+  }
+  .pricing-perks li::before {
+    content: '✓';
+    position: absolute; left: 0;
+    color: var(--lime);
+    font-weight: 700;
+  }
+
+  .pricing-btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: white;
+    font-family: 'Anton', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .pricing-btn:hover { background: rgba(255,255,255,0.1); }
+  .featured .pricing-btn {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark);
+  }
+  .featured .pricing-btn:hover { background: #FFC700; }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    text-align: center;
+    padding: 3rem 2rem;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.2);
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    max-width: 800px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    background: rgba(0,0,0,0.6);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+  }
+
+  /* FLOATING PARTICLES */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    z-index: 0;
+    animation: float-particle linear infinite;
+    opacity: 0;
+  }
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-20vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* COUNTER ANIMATION */
+  .count-up { display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<!-- Floating particles -->
+<script>
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 1;
+    const colors = ['#FFD700','#FF2D55','#00F5FF','#AAFF00','#FF6B00'];
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}vw;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${8+Math.random()*15}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    document.body.appendChild(p);
+  }
+</script>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">🔥 Humanity's Greatest Achievement</div>
+
+  <h1 class="main-title">A BUTTON<br>THAT SAYS<br>HELLO</h1>
+
+  <p class="sub-title">The World's First Self-Aware Greeting Interface™</p>
+
+  <p class="hero-desc">
+    After <em>14 years</em> of research, <em>$4.7 billion</em> in funding,
+    and the collective intellectual firepower of <em>3 PhDs and an intern named Chad</em>,
+    we present the most transformative piece of software since the invention of the semicolon.
+  </p>
+
+  <div class="cta-group">
+    <button class="cta-primary" onclick="alert('Hello! (You just experienced the future.)')">
+      EXPERIENCE THE FUTURE
+    </button>
+    <button class="cta-secondary">WATCH 47-MIN KEYNOTE</button>
+  </div>
+
+  <div class="scroll-hint">Scroll to believe</div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item">DISRUPTING THE GREETING INDUSTRY</span>
+    <span class="ticker-item">PARADIGM SHIFT IMMINENT</span>
+    <span class="ticker-item">HELLO 2.0 IS HERE</span>
+    <span class="ticker-item">SYNERGIZING SALUTATIONS</span>
+    <span class="ticker-item">10X YOUR WAVE CONVERSION</span>
+    <span class="ticker-item">NEXT-GEN NOD TECHNOLOGY</span>
+    <span class="ticker-item">DISRUPTING THE GREETING INDUSTRY</span>
+    <span class="ticker-item">PARADIGM SHIFT IMMINENT</span>
+    <span class="ticker-item">HELLO 2.0 IS HERE</span>
+    <span class="ticker-item">SYNERGIZING SALUTATIONS</span>
+    <span class="ticker-item">10X YOUR WAVE CONVERSION</span>
+    <span class="ticker-item">NEXT-GEN NOD TECHNOLOGY</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-number">847M</span>
+      <span class="stat-label">Hellos Delivered</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">0.3ms</span>
+      <span class="stat-label">Click-to-Hello Latency</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">99.9%</span>
+      <span class="stat-label">Hello Accuracy Rate</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number">∞</span>
+      <span class="stat-label">Hellos Per Second (Theoretical)</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding: 6rem 2rem;">
+  <div class="features-section">
+    <div class="features-header">
+      <p class="section-label">Core Capabilities</p>
+      <h2 class="section-title">ENGINEERED FOR<br><span style="color: var(--hot);">PURE HELLO.</span></h2>
+      <p style="color: rgba(255,255,255,0.5); max-width: 500px; margin: 0 auto; font-weight: 300;">
+        Every pixel. Every millisecond. Every salutation. Obsessively crafted by people who should probably go outside.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-name">Quantum Hello Engine™</div>
+        <p class="feature-desc">Leverages proprietary quantum-adjacent algorithms to say "Hello" up to 3x faster than legacy hello solutions. Patent pending in 47 countries.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <div class="feature-name">Neural Salutation AI</div>
+        <p class="feature-desc">Our large language model has been fine-tuned on 4 trillion greeting tokens to ensure every Hello feels emotionally authentic and blockchain-verified.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌍</span>
+        <div class="feature-name">Global Hello Infrastructure</div>
+        <p class="feature-desc">12 data centers across 3 continents ensure your Hello reaches its target in under 300ms, regardless of timezone or existential context.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <div class="feature-name">Military-Grade Hello Security</div>
+        <p class="feature-desc">End-to-end encryption ensures your Hello cannot be intercepted, monetized, or weaponized by third parties. SOC2 Type II certified.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <div class="feature-name">Hello Analytics Suite</div>
+        <p class="feature-desc">Track open rates, emotional resonance scores, and Hello-to-Goodbye conversion funnels with our real-time intelligence dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🚀</span>
+        <div class="feature-name">Infinite Hello Scalability</div>
+        <p class="feature-desc">Kubernetes-native architecture scales from 1 Hello to 1 billion Hellos without breaking a sweat. We've never actually tested 1 billion, but we're confident.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <p class="giant-quote">
+    "This button completely <span>destroyed</span> my previous understanding of what a button could be. I wept. I clapped. I said hello back."
+  </p>
+  <p class="quote-attr">— A real person we definitely didn't invent &nbsp;·&nbsp; Chief Hello Officer, Fortune 500 Company*</p>
+</section>
+
+<!-- PRICING -->
+<section style="padding: 6rem 2rem;">
+  <div class="pricing-section">
+    <p class="section-label">Transparent Pricing™</p>
+    <h2 class="section-title" style="font-size: clamp(2.5rem, 5vw, 4rem);">CHOOSE YOUR<br>HELLO TIER</h2>
+    <p style="color: rgba(255,255,255,0.5); font-weight: 300;">
+      Every tier includes the button. The tiers are mostly vibes.
+    </p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <p class="pricing-tier">Mortal</p>
+        <div class="pricing-price"><sup>$</sup>0</div>
+        <p class="pricing-period">per month / per hello / per soul</p>
+        <ul class="pricing-perks">
+          <li>One (1) Hello button</li>
+          <li>Alert box says "Hello"</li>
+          <li>Grey close button included</li>
+          <li>Community Discord access</li>
+        </ul>
+        <button class="pricing-btn">START FOR FREE</button>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="pricing-badge">MOST POPULAR WITH INVESTORS</div>
+        <p class="pricing-tier">Transcendent</p>
+        <div class="pricing-price"><sup>$</sup>99</div>
+        <p class="pricing-period">per month (billed as one lump of sadness)</p>
+        <ul class="pricing-perks">
+          <li>Same button, but gold-colored</li>
+          <li>Alert box says "Hello!!!" (3 exclamations)</li>
+          <li>Priority hello queue</li>
+          <li>Custom hello font (+$40/mo)</li>
+          <li>Dedicated Hello Success Manager</li>
+          <li>Quarterly Hello Reviews</li>
+        </ul>
+        <button class="pricing-btn">BEGIN TRANSCENDENCE</button>
+      </div>
+
+      <div class="pricing-card">
+        <p class="pricing-tier">Enterprise</p>
+        <div class="pricing-price" style="font-size: 2.5rem; padding-top: 0.75rem;">CALL US</div>
+        <p class="pricing-period">we'll find out your budget first</p>
+        <ul class="pricing-perks">
+          <li>Unlimited hello customization</li>
+          <li>On-site hello training (3 days)</li>
+          <li>Custom SLA: ≥1 Hello/day guaranteed</li>
+          <li>White-glove hello onboarding</li>
+          <li>Annual Hello Gala invitation</li>
+          <li>Named after button in changelog</li>
+        </ul>
+        <button class="pricing-btn">SCHEDULE A CALL</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <p>
+    *Testimonial from a fictional Fortune 500 company. Any emotional responses to our Hello Button™ are the sole responsibility of the user. HelloCorp Inc. is not liable for joy, confusion, or philosophical crises triggered by use of the product. "Hello" has not been evaluated by the FDA. Results vary. Past hellos do not guarantee future hellos. The Quantum Hello Engine™ does not actually use quantum computing. "Neural" refers to our one (1) neural network which has 3 layers and was trained on a MacBook Pro. Infinite scalability tested up to 4 concurrent users. The Hello Analytics Suite dashboard is a screenshot from Figma. Chad the intern was let go in Q2 but remains a spiritual co-founder. By clicking the button you agree to our Terms of Salutation, Privacy Nod Policy, and Cookie Wink Agreement. HelloCorp™ is a registered trademark of an LLC we formed last Tuesday. Our $4.7B funding figure includes a $4.6B Series A we are "in conversations about." This website uses no cookies but may use vibes.
+  </p>
+</div>
+
+<footer>
+  © 2026 HelloCorp™ · The World's Premier Button Company · All Rights Reserved · All Hellos Reserved · Terms · Privacy · Wave Policy
+</footer>
+
+</body>
+</html>

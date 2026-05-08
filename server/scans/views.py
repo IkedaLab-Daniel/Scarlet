@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from pathlib import Path
 import nmap
 import json
 import csv
@@ -150,3 +153,23 @@ def main():
     generate_report(hosts, port_results, version_info, vulnerabilities, args.output)
     total_open = sum(len(p) for p in port_results.values())
     print(f"\n[*] Scan complete: {len(hosts)} hosts, {total_open} open ports, {len(vulnerabilities)} vulns found")
+
+
+@csrf_exempt
+def receive_scan(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    try:
+        raw_body = request.body.decode("utf-8")
+        payload = json.loads(raw_body) if raw_body else {}
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    output_dir = Path(__file__).resolve().parent / "received"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = output_dir / f"scan_{timestamp}.json"
+    output_path.write_text(json.dumps(payload, indent=2))
+
+    return JsonResponse({"status": "ok", "file": str(output_path)})

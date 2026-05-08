@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from scans.views import receive_scan
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/scans/', receive_scan),
 ]
