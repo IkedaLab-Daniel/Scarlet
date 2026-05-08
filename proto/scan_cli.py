@@ -15,6 +15,11 @@ def run_scan(target, ports):
     scan_type = "-sS" if is_root() else "-sT"
     args = f"{scan_type} -T4"
 
+    if is_root():
+        args += " -A"
+    else:
+        args += " -sV -sC --version-intensity 7"
+
     scanner.scan(hosts=target, ports=ports, arguments=args)
 
     results = {}

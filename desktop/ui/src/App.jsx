@@ -4,8 +4,8 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 
-const DEFAULT_TARGET = '192.168.1.0/24'
-const DEFAULT_PORTS = '1-1024'
+const DEFAULT_TARGET = '127.0.0.1'
+const DEFAULT_PORTS = '1-10000'
 
 function App() {
   const [target, setTarget] = useState(DEFAULT_TARGET)
@@ -18,7 +18,7 @@ function App() {
   const [scanLoading, setScanLoading] = useState(false)
   const desktopApi = typeof window !== 'undefined' ? window.desktopApi : null
 
-  const isPrivateTarget = useMemo(() => {
+  const isLocalTarget = useMemo(() => {
     const value = target.trim().toLowerCase()
     if (!value) {
       return false
@@ -27,9 +27,6 @@ function App() {
     const host = value.split('/')[0].split(':')[0]
     return (
       host === 'localhost' ||
-      host.startsWith('10.') ||
-      host.startsWith('192.168.') ||
-      /^172\.(1[6-9]|2\d|3[0-1])\./.test(host) ||
       host.startsWith('127.')
     )
   }, [target])
@@ -105,16 +102,17 @@ function App() {
         <div className="agent-panel">
           <div>
             <h2>Local scan</h2>
-            <p>Only private network targets are allowed.</p>
+            <p>This MVP scans only this device (localhost).</p>
           </div>
           <div className="agent-row">
             <label className="agent-field">
-              <span>Target</span>
+              <span>Target (this device)</span>
               <input
                 type="text"
                 value={target}
                 onChange={(event) => setTarget(event.target.value)}
                 placeholder="127.0.0.1"
+                readOnly
               />
             </label>
             <label className="agent-field">
@@ -123,7 +121,7 @@ function App() {
                 type="text"
                 value={ports}
                 onChange={(event) => setPorts(event.target.value)}
-                placeholder="1-1024"
+                placeholder="1-10000"
               />
             </label>
           </div>
@@ -143,12 +141,12 @@ function App() {
               type="button"
               className="counter"
               onClick={() => requestConsent('manual')}
-              disabled={scanLoading || !isPrivateTarget}
+              disabled={scanLoading || !isLocalTarget}
             >
               {scanLoading ? 'Scanning...' : 'Request scan'}
             </button>
-            {!isPrivateTarget ? (
-              <span className="agent-error">Use a private target.</span>
+            {!isLocalTarget ? (
+              <span className="agent-error">Use localhost only.</span>
             ) : null}
           </div>
           {scanError ? (
@@ -182,15 +180,15 @@ function App() {
             {pendingRequest?.rawUrl ? (
               <p className="agent-note">Source: {pendingRequest.rawUrl}</p>
             ) : null}
-            {!isPrivateTarget ? (
-              <p className="agent-error">Target must be private.</p>
+            {!isLocalTarget ? (
+              <p className="agent-error">Target must be localhost.</p>
             ) : null}
             <div className="modal-actions">
               <button
                 type="button"
                 className="counter"
                 onClick={approveConsent}
-                disabled={!isPrivateTarget || scanLoading}
+                disabled={!isLocalTarget || scanLoading}
               >
                 Approve
               </button>

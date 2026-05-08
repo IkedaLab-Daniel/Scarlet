@@ -26,3 +26,5 @@ static/
 .idea/
 .vscode/
 *.swp
+
+scans

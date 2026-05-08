@@ -5,8 +5,8 @@ import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
-  const [target, setTarget] = useState('192.168.1.0/24')
-  const [ports, setPorts] = useState('1-1024')
+  const [target, setTarget] = useState('127.0.0.1')
+  const [ports, setPorts] = useState('1-65535')
   const [launchError, setLaunchError] = useState('')
 
   const openDesktopScanner = () => {
@@ -39,16 +39,17 @@ function App() {
         <div className="scan-panel">
           <div>
             <h2>Open desktop scanner</h2>
-            <p>Launch the local app to scan your private network.</p>
+            <p>Launch the local app to scan this device only.</p>
           </div>
           <div className="scan-row">
             <label className="scan-field">
-              <span>Target</span>
+              <span>Target (this device)</span>
               <input
                 type="text"
                 value={target}
                 onChange={(event) => setTarget(event.target.value)}
-                placeholder="192.168.1.0/24"
+                placeholder="127.0.0.1"
+                readOnly
               />
             </label>
             <label className="scan-field">
@@ -57,7 +58,7 @@ function App() {
                 type="text"
                 value={ports}
                 onChange={(event) => setPorts(event.target.value)}
-                placeholder="1-1024"
+                placeholder="1-65535"
               />
             </label>
           </div>
