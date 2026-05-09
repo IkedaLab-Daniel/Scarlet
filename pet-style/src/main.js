@@ -9,12 +9,14 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 200,
     height: 340,
+    minWidth: 200,
+    minHeight: 340,
     x: width - 220,
     y: height - 370,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
-    resizable: false,
+    resizable: true,
     skipTaskbar: true,
     hasShadow: false,
     webPreferences: {
@@ -76,6 +78,24 @@ ipcMain.handle('ask-groq', async (event, userMessage) => {
       return "Oops! I need an API key to chat~ Set GROQ_API_KEY in your environment! 🔑";
     }
     return "Ahh, something went wrong! Try again? (⌯˃̶᷄ ﹏ ˂̶᷄⌯)";
+  }
+});
+
+// IPC: Window position for manual dragging
+ipcMain.handle('get-window-position', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win) return { x: 0, y: 0 };
+  const [x, y] = win.getPosition();
+  return { x, y };
+});
+
+ipcMain.on('set-window-position', (event, position) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (!win || !position) return;
+  const x = Number(position.x);
+  const y = Number(position.y);
+  if (Number.isFinite(x) && Number.isFinite(y)) {
+    win.setPosition(Math.round(x), Math.round(y));
   }
 });
 

@@ -14,16 +14,21 @@
     body {
       background: transparent;
       overflow: hidden;
-      width: 200px;
-      height: 300px;
+      width: 100%;
+      height: 100%;
+      min-width: 200px;
+      min-height: 340px;
       font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-app-region: drag;
     }
 
     #app {
-      width: 200px;
-      height: 370px;
+      width: 100%;
+      height: 100%;
+      min-width: 200px;
+      min-height: 340px;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -46,6 +51,7 @@
       pointer-events: none;
       transition: opacity 0.25s ease, transform 0.25s ease;
       transform-origin: bottom center;
+      -webkit-app-region: no-drag;
     }
 
     #chat-area.visible {
@@ -67,6 +73,7 @@
       width: 100%;
       position: relative;
       box-shadow: 0 4px 20px rgba(200, 100, 130, 0.25), 0 2px 6px rgba(0,0,0,0.1);
+      -webkit-app-region: no-drag;
     }
 
     /* Bubble tail */
@@ -96,6 +103,7 @@
       color: #4a2a3a;
       min-height: 18px;
       word-break: break-word;
+      -webkit-app-region: no-drag;
     }
 
     #message-text.typing::after {
@@ -118,6 +126,7 @@
       gap: 5px;
       margin-top: 8px;
       align-items: center;
+      -webkit-app-region: no-drag;
     }
 
     #user-input {
@@ -130,6 +139,7 @@
       color: #4a2a3a;
       outline: none;
       transition: border-color 0.2s;
+      -webkit-app-region: no-drag;
     }
 
     #user-input:focus {
@@ -148,6 +158,7 @@
       justify-content: center;
       transition: transform 0.15s, filter 0.15s;
       flex-shrink: 0;
+      -webkit-app-region: no-drag;
     }
 
     #send-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
@@ -285,6 +296,10 @@
 
     let chatOpen = false;
     let isTyping = false;
+    let isDragging = false;
+    let dragMoved = false;
+    let dragStart = { x: 0, y: 0 };
+    let windowStart = null;
 
     const characterImages = [
       './character_default.png',
@@ -299,10 +314,43 @@
 
     // ── Toggle chat on character click ──
     charImg.addEventListener('click', (e) => {
+      if (dragMoved) {
+        dragMoved = false;
+        return;
+      }
       e.stopPropagation();
       toggleChat();
       doBounce();
       spawnSparkles(e);
+    });
+
+    // ── Drag window by character ──
+    charImg.addEventListener('mousedown', async (e) => {
+      if (e.button !== 0) return;
+      isDragging = true;
+      dragMoved = false;
+      dragStart = { x: e.screenX, y: e.screenY };
+      windowStart = await window.petAPI.getWindowPosition();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging || !windowStart) return;
+      const dx = e.screenX - dragStart.x;
+      const dy = e.screenY - dragStart.y;
+      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+        dragMoved = true;
+      }
+      window.petAPI.setWindowPosition({
+        x: windowStart.x + dx,
+        y: windowStart.y + dy
+      });
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (dragMoved) {
+        setTimeout(() => { dragMoved = false; }, 0);
+      }
+      isDragging = false;
     });
 
     function toggleChat() {
