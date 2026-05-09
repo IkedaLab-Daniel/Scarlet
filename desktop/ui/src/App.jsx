@@ -7,6 +7,12 @@ import './App.css'
 const DEFAULT_TARGET = '127.0.0.1'
 const DEFAULT_PORTS = '1-10000'
 
+const formatElapsed = (totalSeconds) => {
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
 function App() {
   const [target, setTarget] = useState(DEFAULT_TARGET)
   const [ports, setPorts] = useState(DEFAULT_PORTS)
@@ -16,6 +22,8 @@ function App() {
   const [serverResult, setServerResult] = useState(null)
   const [scanError, setScanError] = useState('')
   const [scanLoading, setScanLoading] = useState(false)
+  const [scanStartedAt, setScanStartedAt] = useState(null)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const desktopApi = typeof window !== 'undefined' ? window.desktopApi : null
 
   const isLocalTarget = useMemo(() => {
@@ -46,6 +54,18 @@ function App() {
     return () => unsubscribe?.()
   }, [desktopApi])
 
+  useEffect(() => {
+    if (!scanLoading || scanStartedAt === null) {
+      return undefined
+    }
+
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - scanStartedAt) / 1000))
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [scanLoading, scanStartedAt])
+
   const runScan = async () => {
     if (!desktopApi?.runScan) {
       setScanError('Desktop API not available. Start the Electron app.')
@@ -53,6 +73,8 @@ function App() {
     }
 
     setScanLoading(true)
+    setScanStartedAt(Date.now())
+    setElapsedSeconds(0)
     setScanError('')
     setScanResult(null)
     setServerResult(null)
@@ -148,6 +170,24 @@ function App() {
             {!isLocalTarget ? (
               <span className="agent-error">Use localhost only.</span>
             ) : null}
+          </div>
+          <div className="agent-progress">
+            <div>
+              <span className="agent-label">Elapsed</span>
+              <span className="agent-value">
+                {scanLoading || elapsedSeconds > 0
+                  ? formatElapsed(elapsedSeconds)
+                  : '00:00'}
+              </span>
+            </div>
+            <div>
+              <span className="agent-label">Phase</span>
+              <span className="agent-value">
+                {scanLoading
+                  ? 'Phase 1/2: ports + services (then vuln scripts)'
+                  : 'Idle'}
+              </span>
+            </div>
           </div>
           {scanError ? (
             <p className="agent-error" role="alert">

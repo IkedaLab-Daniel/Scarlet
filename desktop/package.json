@@ -1,17 +1,55 @@
 {
   "name": "desktop",
   "version": "1.0.0",
-  "description": "",
+  "description": "Scarlet desktop scanner",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build:ui": "npm --prefix ui run build",
+    "dist": "npm run build:ui && electron-builder",
+    "dist:mac": "npm run build:ui && electron-builder --mac"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {
-    "electron": "^41.5.0"
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^41.5.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.scarlet.desktop",
+    "productName": "Scarlet",
+    "icon": "assets/logo.png",
+    "files": [
+      "index.js",
+      "preload.js",
+      "proto/scan_cli.py",
+      "ui/dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "proto/scan_cli.py",
+        "to": "proto/scan_cli.py"
+      }
+    ],
+    "mac": {
+      "icon": "assets/logo.png",
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.utilities"
+    },
+    "protocols": [
+      {
+        "name": "Scarlet",
+        "schemes": [
+          "scarlet"
+        ]
+      }
+    ]
   }
 }

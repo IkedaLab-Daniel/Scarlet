@@ -5,7 +5,6 @@ const fs = require('fs');
 
 const PROTOCOL = 'scarlet';
 const ROOT_DIR = path.join(__dirname, '..');
-const SCAN_SCRIPT = path.join(ROOT_DIR, 'proto', 'scan_cli.py');
 const DEFAULT_SERVER_URL = 'http://localhost:8000/api/scans/';
 const PYTHON_BIN = process.env.SCARLET_PYTHON || 'python3';
 const SERVER_URL = process.env.SCARLET_SERVER_URL || DEFAULT_SERVER_URL;
@@ -88,17 +87,31 @@ function registerProtocol() {
     }
 }
 
+function resolveScanScript() {
+    const candidates = [];
+
+    if (app.isPackaged) {
+        candidates.push(path.join(process.resourcesPath, 'proto', 'scan_cli.py'));
+    }
+
+    candidates.push(path.join(__dirname, 'proto', 'scan_cli.py'));
+    candidates.push(path.join(ROOT_DIR, 'proto', 'scan_cli.py'));
+
+    return candidates.find((candidate) => fs.existsSync(candidate));
+}
+
 function runPythonScan({ target, ports }) {
     if (!target) {
         return Promise.reject(new Error('Target is required'));
     }
 
-    if (!fs.existsSync(SCAN_SCRIPT)) {
+    const scanScript = resolveScanScript();
+    if (!scanScript) {
         return Promise.reject(new Error('Scan script not found'));
     }
 
     return new Promise((resolve, reject) => {
-        const args = [SCAN_SCRIPT, '--target', target, '--ports', ports || '1-1024'];
+        const args = [scanScript, '--target', target, '--ports', ports || '1-1024'];
         const child = spawn(PYTHON_BIN, args, { cwd: ROOT_DIR });
 
         let stdout = '';

@@ -248,6 +248,28 @@
   gap: 12px;
 }
 
+.agent-progress {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.agent-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+
+.agent-value {
+  display: block;
+  color: var(--text-h);
+  font-weight: 500;
+}
+
 .agent-result {
   font: 12px/1.5 var(--mono);
   background: var(--bg);
@@ -295,6 +317,10 @@
 
 @media (max-width: 1024px) {
   .agent-row {
+    grid-template-columns: 1fr;
+  }
+
+  .agent-progress {
     grid-template-columns: 1fr;
   }
 }
