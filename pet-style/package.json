@@ -1,0 +1,19 @@
+{
+  "name": "chibi-pet",
+  "version": "1.0.0",
+  "description": "A transparent chibi desktop pet assistant powered by Groq",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.7.0"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0"
+  },
+  "keywords": ["electron", "desktop-pet", "groq", "llama"],
+  "author": "",
+  "license": "MIT"
+}
