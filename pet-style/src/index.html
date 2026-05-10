@@ -120,6 +120,55 @@
       50% { opacity: 1; }
     }
 
+    /* ── Process List ── */
+    #process-list {
+      width: 100%;
+      margin-top: 6px;
+      display: none;
+      max-height: 140px;
+      overflow-y: auto;
+      -webkit-app-region: no-drag;
+    }
+
+    .process-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 2px;
+      border-radius: 8px;
+      -webkit-app-region: no-drag;
+    }
+
+    .process-item + .process-item {
+      border-top: 1px dashed #f2c3d1;
+    }
+
+    .process-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: #f6d3dd;
+      color: #7a3b4b;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .process-icon img {
+      width: 18px;
+      height: 18px;
+      object-fit: cover;
+    }
+
+    .process-name {
+      font-size: 11px;
+      color: #4a2a3a;
+      line-height: 1.3;
+    }
+
     /* Input row inside bubble */
     #input-row {
       display: flex;
@@ -262,6 +311,7 @@
     <div id="chat-area">
       <div id="bubble">
         <div id="message-text">Hey there~! Click me to chat! ✨</div>
+        <div id="process-list" aria-live="polite"></div>
         <div id="input-row">
           <input id="user-input" type="text" placeholder="Ask me anything..." maxlength="200" />
           <button id="send-btn" title="Send">
@@ -288,6 +338,7 @@
   <script>
     const chatArea   = document.getElementById('chat-area');
     const messageText = document.getElementById('message-text');
+    const processList = document.getElementById('process-list');
     const userInput  = document.getElementById('user-input');
     const sendBtn    = document.getElementById('send-btn');
     const charImg    = document.getElementById('character-img');
@@ -396,17 +447,70 @@
       }
     }
 
+    function clearProcessList() {
+      processList.innerHTML = '';
+      processList.style.display = 'none';
+    }
+
+    function renderProcessList(apps) {
+      clearProcessList();
+      if (!apps || apps.length === 0) return;
+
+      apps.forEach((app) => {
+        const item = document.createElement('div');
+        item.className = 'process-item';
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'process-icon';
+
+        if (app.iconDataUrl) {
+          const img = document.createElement('img');
+          img.src = app.iconDataUrl;
+          img.alt = '';
+          iconWrap.appendChild(img);
+        } else {
+          const letter = (app.name || '?').slice(0, 1).toUpperCase();
+          iconWrap.textContent = letter;
+        }
+
+        const name = document.createElement('div');
+        name.className = 'process-name';
+        name.textContent = app.name || 'Unknown';
+
+        item.appendChild(iconWrap);
+        item.appendChild(name);
+        processList.appendChild(item);
+      });
+
+      processList.style.display = 'block';
+    }
+
     // ── Command shortcuts ──
     async function tryHandleCommand(text) {
       const normalized = text.trim().toLowerCase();
       const isTeams = /^open\s+(microsoft\s+)?teams$/.test(normalized) || normalized === 'open ms teams';
+      const isProcess = /^(display|show)\s+process(es)?$/.test(normalized);
 
       if (isTeams) {
         const result = await window.petAPI.openApp('teams');
         if (result && result.ok) {
-          return 'Opening Microsoft Teams...';
+          return { mode: 'text', text: 'Opening Microsoft Teams...' };
         }
-        return (result && result.message) ? result.message : 'I could not open Microsoft Teams.';
+        return {
+          mode: 'text',
+          text: (result && result.message) ? result.message : 'I could not open Microsoft Teams.'
+        };
+      }
+
+      if (isProcess) {
+        const result = await window.petAPI.getRunningApps();
+        if (result && result.ok) {
+          return { mode: 'processList', text: 'Running apps:', apps: result.apps };
+        }
+        return {
+          mode: 'text',
+          text: (result && result.message) ? result.message : 'I could not read running apps.'
+        };
       }
 
       return null;
@@ -426,10 +530,14 @@
       messageText.classList.add('typing');
 
       try {
-        const commandReply = await tryHandleCommand(text);
-        if (commandReply) {
+        clearProcessList();
+        const commandResult = await tryHandleCommand(text);
+        if (commandResult) {
           messageText.classList.remove('typing');
-          await typeWriter(commandReply);
+          await typeWriter(commandResult.text || '');
+          if (commandResult.mode === 'processList') {
+            renderProcessList(commandResult.apps);
+          }
         } else {
           setRandomCharacter();
           const reply = await window.petAPI.askGroq(text);

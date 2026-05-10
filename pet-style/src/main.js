@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { execFile } = require('child_process');
 
 let mainWindow;
@@ -59,6 +60,65 @@ function openMacApp(appNames) {
     // Try a few common app names to reduce false negatives.
     tryNext(0);
   });
+}
+
+function getRunningAppsMac() {
+  const script = `
+    set appList to {}
+    tell application "System Events"
+      repeat with p in (application processes where background only is false)
+        set appName to name of p
+        set appFile to ""
+        try
+          set appFile to POSIX path of (file of p)
+        end try
+        set end of appList to appName & "||" & appFile
+      end repeat
+    end tell
+    set AppleScript's text item delimiters to (ASCII character 10)
+    set output to appList as text
+    set AppleScript's text item delimiters to ""
+    return output
+  `;
+
+  return new Promise((resolve, reject) => {
+    execFile('osascript', ['-e', script], (err, stdout) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const lines = String(stdout || '').trim().split('\n').filter(Boolean);
+      const items = lines.map((line) => {
+        const [name, filePath] = line.split('||');
+        return { name: (name || '').trim(), path: (filePath || '').trim() };
+      }).filter((item) => item.name.length > 0);
+
+      resolve(items);
+    });
+  });
+}
+
+async function getRunningAppsWithIcons() {
+  const apps = await getRunningAppsMac();
+  const results = [];
+
+  for (const item of apps) {
+    let iconDataUrl = null;
+    if (item.path && fs.existsSync(item.path)) {
+      try {
+        const icon = await app.getFileIcon(item.path, { size: 'small' });
+        if (icon && !icon.isEmpty()) {
+          iconDataUrl = icon.toDataURL();
+        }
+      } catch (error) {
+        // Ignore icon failures and continue without an icon.
+      }
+    }
+    results.push({ name: item.name, iconDataUrl });
+  }
+
+  return results;
 }
 
 app.whenReady().then(() => {
@@ -149,6 +209,20 @@ ipcMain.handle('open-app', async (event, appKey) => {
   } catch (error) {
     console.error('Open app error:', error);
     return { ok: false, message: 'I could not open Microsoft Teams. Is it installed?' };
+  }
+});
+
+ipcMain.handle('get-running-apps', async () => {
+  if (process.platform !== 'darwin') {
+    return { ok: false, message: 'This command currently works on macOS only.' };
+  }
+
+  try {
+    const apps = await getRunningAppsWithIcons();
+    return { ok: true, apps };
+  } catch (error) {
+    console.error('Get running apps error:', error);
+    return { ok: false, message: 'I could not read running apps.' };
   }
 });
 

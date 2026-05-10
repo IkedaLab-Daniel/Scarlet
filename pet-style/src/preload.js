@@ -6,4 +6,5 @@ contextBridge.exposeInMainWorld('petAPI', {
   setWindowPosition: (position) => ipcRenderer.send('set-window-position', position),
   quitApp: () => ipcRenderer.invoke('quit-app'),
   openApp: (appKey) => ipcRenderer.invoke('open-app', appKey),
+  getRunningApps: () => ipcRenderer.invoke('get-running-apps'),
 });
