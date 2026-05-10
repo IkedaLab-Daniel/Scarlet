@@ -396,6 +396,22 @@
       }
     }
 
+    // ── Command shortcuts ──
+    async function tryHandleCommand(text) {
+      const normalized = text.trim().toLowerCase();
+      const isTeams = /^open\s+(microsoft\s+)?teams$/.test(normalized) || normalized === 'open ms teams';
+
+      if (isTeams) {
+        const result = await window.petAPI.openApp('teams');
+        if (result && result.ok) {
+          return 'Opening Microsoft Teams...';
+        }
+        return (result && result.message) ? result.message : 'I could not open Microsoft Teams.';
+      }
+
+      return null;
+    }
+
     // ── Send message ──
     async function sendMessage() {
       const text = userInput.value.trim();
@@ -410,11 +426,17 @@
       messageText.classList.add('typing');
 
       try {
-        setRandomCharacter();
-        const reply = await window.petAPI.askGroq(text);
-        messageText.classList.remove('typing');
-        // Typewriter effect
-        await typeWriter(reply);
+        const commandReply = await tryHandleCommand(text);
+        if (commandReply) {
+          messageText.classList.remove('typing');
+          await typeWriter(commandReply);
+        } else {
+          setRandomCharacter();
+          const reply = await window.petAPI.askGroq(text);
+          messageText.classList.remove('typing');
+          // Typewriter effect
+          await typeWriter(reply);
+        }
       } catch (err) {
         messageText.classList.remove('typing');
         messageText.textContent = 'Something went wrong~ (｡•́︿•̀｡)';

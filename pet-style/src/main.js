@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
+const { execFile } = require('child_process');
 
 let mainWindow;
 
@@ -35,6 +36,29 @@ function createWindow() {
   if (process.argv.includes('--dev')) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
+}
+
+function openMacApp(appNames) {
+  const names = Array.isArray(appNames) ? appNames : [appNames];
+
+  return new Promise((resolve, reject) => {
+    const tryNext = (index) => {
+      execFile('open', ['-a', names[index]], (err) => {
+        if (!err) {
+          resolve();
+          return;
+        }
+        if (index < names.length - 1) {
+          tryNext(index + 1);
+          return;
+        }
+        reject(err);
+      });
+    };
+
+    // Try a few common app names to reduce false negatives.
+    tryNext(0);
+  });
 }
 
 app.whenReady().then(() => {
@@ -102,6 +126,30 @@ ipcMain.on('set-window-position', (event, position) => {
 // IPC: Quit app
 ipcMain.handle('quit-app', () => {
   app.quit();
+});
+
+// IPC: Open native app shortcuts
+ipcMain.handle('open-app', async (event, appKey) => {
+  if (process.platform !== 'darwin') {
+    return { ok: false, message: 'This command currently works on macOS only.' };
+  }
+
+  const appNamesByKey = {
+    teams: ['Microsoft Teams', 'Microsoft Teams (work or school)']
+  };
+
+  const appNames = appNamesByKey[appKey];
+  if (!appNames) {
+    return { ok: false, message: 'Unknown app request.' };
+  }
+
+  try {
+    await openMacApp(appNames);
+    return { ok: true };
+  } catch (error) {
+    console.error('Open app error:', error);
+    return { ok: false, message: 'I could not open Microsoft Teams. Is it installed?' };
+  }
 });
 
 // IPC: Start drag
