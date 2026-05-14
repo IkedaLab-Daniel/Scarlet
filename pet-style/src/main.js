@@ -7,14 +7,18 @@ let mainWindow;
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const windowWidth = 200;
+  const windowHeight = 500;
+  const edgeGap = 20;
+  const bottomGap = 30;
 
   mainWindow = new BrowserWindow({
-    width: 200,
-    height: 340,
-    minWidth: 200,
-    minHeight: 340,
-    x: width - 220,
-    y: height - 370,
+    width: windowWidth,
+    height: windowHeight,
+    minWidth: windowWidth,
+    minHeight: windowHeight,
+    x: width - (windowWidth + edgeGap),
+    y: height - (windowHeight + bottomGap),
     transparent: true,
     frame: false,
     alwaysOnTop: true,
