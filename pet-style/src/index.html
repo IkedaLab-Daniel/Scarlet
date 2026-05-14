@@ -24,6 +24,14 @@
       -webkit-app-region: drag;
     }
 
+    :root {
+      --pomo-bg: rgba(255, 246, 248, 0.92);
+      --pomo-border: #f1b3c0;
+      --pomo-accent: #e8607a;
+      --pomo-break: #f0b15a;
+      --pomo-shadow: 0 6px 18px rgba(200, 100, 130, 0.2), 0 2px 6px rgba(0,0,0,0.08);
+    }
+
     #app {
       width: 100%;
       height: 100%;
@@ -34,6 +42,102 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
+    }
+
+    /* ── Pomodoro ── */
+    #pomodoro {
+      width: 176px;
+      margin-bottom: 6px;
+      padding: 8px 10px 9px;
+      border-radius: 14px;
+      background: var(--pomo-bg);
+      border: 2px solid var(--pomo-border);
+      box-shadow: var(--pomo-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      -webkit-app-region: no-drag;
+      font-family: 'Chalkboard SE', 'Comic Sans MS', 'Segoe UI', sans-serif;
+    }
+
+    #pomodoro.break {
+      border-color: var(--pomo-break);
+    }
+
+    .pomo-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pomo-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: #7a3b4b;
+    }
+
+    #pomodoro.break .pomo-label {
+      color: #9a5a1a;
+    }
+
+    .pomo-time {
+      font-size: 18px;
+      font-weight: 700;
+      color: #4a2a3a;
+    }
+
+    .pomo-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .pomo-btn {
+      flex: 1;
+      border: none;
+      border-radius: 9px;
+      padding: 5px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, #e8607a, #c8405a);
+      color: #fff;
+      transition: transform 0.15s, filter 0.15s;
+      -webkit-app-region: no-drag;
+    }
+
+    .pomo-btn:hover { transform: scale(1.04); filter: brightness(1.06); }
+    .pomo-btn:active { transform: scale(0.98); }
+
+    .pomo-btn.ghost {
+      background: transparent;
+      color: #7a3b4b;
+      border: 1.5px dashed var(--pomo-border);
+    }
+
+    #pomodoro.break .pomo-btn.ghost {
+      border-color: var(--pomo-break);
+      color: #9a5a1a;
+    }
+
+    .pomo-bar {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(232, 160, 176, 0.35);
+      overflow: hidden;
+    }
+
+    .pomo-progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e8607a, #f59ab0);
+      transition: width 0.25s linear;
+    }
+
+    #pomodoro.break .pomo-progress {
+      background: linear-gradient(90deg, #f2b35d, #f07f3c);
     }
 
     /* ── Chat Bubble ── */
@@ -323,6 +427,21 @@
       </div>
     </div>
 
+    <!-- Pomodoro timer -->
+    <div id="pomodoro" aria-live="polite">
+      <div class="pomo-header">
+        <span class="pomo-label" id="pomo-label">Work</span>
+        <span class="pomo-time" id="pomo-time">25:00</span>
+      </div>
+      <div class="pomo-controls">
+        <button id="pomo-toggle" class="pomo-btn" type="button">Start</button>
+        <button id="pomo-reset" class="pomo-btn ghost" type="button">Reset</button>
+      </div>
+      <div class="pomo-bar" aria-hidden="true">
+        <div id="pomo-progress" class="pomo-progress"></div>
+      </div>
+    </div>
+
     <!-- Character -->
     <div id="character-wrap">
       <img
@@ -344,6 +463,12 @@
     const charImg    = document.getElementById('character-img');
     const quitBtn    = document.getElementById('quit-btn');
     const app        = document.getElementById('app');
+    const pomodoro   = document.getElementById('pomodoro');
+    const pomoLabel  = document.getElementById('pomo-label');
+    const pomoTime   = document.getElementById('pomo-time');
+    const pomoToggle = document.getElementById('pomo-toggle');
+    const pomoReset  = document.getElementById('pomo-reset');
+    const pomoProgress = document.getElementById('pomo-progress');
 
     let chatOpen = false;
     let isTyping = false;
@@ -351,6 +476,13 @@
     let dragMoved = false;
     let dragStart = { x: 0, y: 0 };
     let windowStart = null;
+
+    const POMO_WORK_SECONDS = 25 * 60;
+    const POMO_BREAK_SECONDS = 5 * 60;
+    let pomoMode = 'work';
+    let pomoRemaining = POMO_WORK_SECONDS;
+    let pomoTimer = null;
+    let pomoRunning = false;
 
     const characterImages = [
       './character_default.png',
@@ -362,6 +494,72 @@
       const next = characterImages[Math.floor(Math.random() * characterImages.length)];
       charImg.setAttribute('src', next);
     }
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    }
+
+    function updatePomodoroUI() {
+      const maxSeconds = (pomoMode === 'work') ? POMO_WORK_SECONDS : POMO_BREAK_SECONDS;
+      const progress = ((maxSeconds - pomoRemaining) / maxSeconds) * 100;
+
+      pomoLabel.textContent = (pomoMode === 'work') ? 'Work' : 'Break';
+      pomoTime.textContent = formatTime(pomoRemaining);
+      pomoToggle.textContent = pomoRunning ? 'Pause' : 'Start';
+      pomodoro.classList.toggle('break', pomoMode === 'break');
+      pomoProgress.style.width = Math.max(0, Math.min(100, progress)) + '%';
+    }
+
+    function finishPomodoroSegment() {
+      pomoMode = (pomoMode === 'work') ? 'break' : 'work';
+      pomoRemaining = (pomoMode === 'work') ? POMO_WORK_SECONDS : POMO_BREAK_SECONDS;
+    }
+
+    function tickPomodoro() {
+      if (!pomoRunning) return;
+      pomoRemaining -= 1;
+      if (pomoRemaining <= 0) {
+        finishPomodoroSegment();
+      }
+      updatePomodoroUI();
+    }
+
+    function startPomodoro() {
+      if (pomoRunning) return;
+      pomoRunning = true;
+      pomoTimer = setInterval(tickPomodoro, 1000);
+      updatePomodoroUI();
+    }
+
+    function pausePomodoro() {
+      if (pomoTimer) clearInterval(pomoTimer);
+      pomoTimer = null;
+      pomoRunning = false;
+      updatePomodoroUI();
+    }
+
+    function resetPomodoro() {
+      pausePomodoro();
+      pomoMode = 'work';
+      pomoRemaining = POMO_WORK_SECONDS;
+      updatePomodoroUI();
+    }
+
+    pomoToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (pomoRunning) {
+        pausePomodoro();
+      } else {
+        startPomodoro();
+      }
+    });
+
+    pomoReset.addEventListener('click', (e) => {
+      e.stopPropagation();
+      resetPomodoro();
+    });
 
     // ── Toggle chat on character click ──
     charImg.addEventListener('click', (e) => {
@@ -608,6 +806,8 @@
         }, 2500);
       }
     }, 18000);
+
+    updatePomodoroUI();
   </script>
 </body>
 </html>
